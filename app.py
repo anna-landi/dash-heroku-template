@@ -19,7 +19,6 @@ mycols = ['id', 'wtss', 'sex', 'educ', 'region', 'age', 'coninc',
           'prestg10', 'mapres10', 'papres10', 'sei10', 'satjob',
           'fechld', 'fefam', 'fepol', 'fepresch', 'meovrwrk'] 
 gss_clean = gss[mycols]
-
 gss_clean = gss_clean.rename({'wtss':'weight',
                               'educ':'education',
                               'coninc':'income',
@@ -40,9 +39,9 @@ gss_clean.age = gss_clean.age.astype('float')
 markdown_text = '''
 The Gender Wage Gap:
 
-the following article from the Center for American Progress (https://www.americanprogress.org/issues/women/reports/2020/03/24/482141/quick-facts-gender-wage-gap/) discusses what exactly the gender wage gap is, what drives it, and how it impacts women and their families.
+the following article from the Center for American Progress (https://www.americanprogress.org/issues/women/reports/2020/03/24/482141/quick-facts-gender-wage-gap/) discusses what exactly the gender wage gap is, what drives it, and how it impacts women and their families
 
-the articles states that "the gender wage gap refers to the difference in earnings between women and men".
+the articles states that "the gender wage gap refers to the difference in earnings between women and men"
 
 there are many factors that cause the gender wage gap to persist and these include:
 - differences in industries or jobs worked
@@ -54,13 +53,13 @@ the article concludes by saying that we must address this issue through policy r
 
 The General Social Survey:
 
-the GSS "is a nationally representative survey of adults in the United States conducted since 1972".
+the GSS "is a nationally representative survey of adults in the United States conducted since 1972"
 
-the goal of the survey is to "monitor and explain trends in opinions, attitudes and behaviors".
+the overarching goal of the survey is to "monitor and explain trends in opinions, attitudes and behaviors"
 
-the survey asks respondents for demographic information and about certain behaviors and attitudes.
+the survey asks respondents for demographic information and about certain behaviors and attitudes
 
-according to the official website, the GSS "is the single best source for sociological and attitudinal trend data covering the United States".
+according to the official website, the GSS "is the single best source for sociological and attitudinal trend data covering the United States"
 
 (http://www.gss.norc.org/About-The-GSS)
 '''
@@ -93,10 +92,11 @@ fig_scatter = px.scatter(gss_scatter, x = 'job_prestige', y = 'income',
                          color = 'sex',
                          trendline = 'ols',
                          height = 600, width = 600,
-                         labels = {'job_prestige':'Occupational Prestige',
+                         labels = {'sex':'Gender',
                                    'income':'Income',
-                                   'education':'Years of Education',
-                                   'socioeconomic_index':'Socioeconomic Index'},
+                                   'job_prestige':'Occupational Prestige',
+                                   'socioeconomic_index':'Socioeconomic Index',
+                                   'education':'Years of Education'},
                          hover_data = ['education', 'socioeconomic_index'])
 fig_scatter.show()
 
@@ -110,21 +110,21 @@ fig_boxplot_job_prestige = px.box(gss_clean, x = 'job_prestige', y = 'sex', colo
 fig_boxplot_job_prestige.update_layout(showlegend = False)
 fig_boxplot_job_prestige.show()
 
-gss_new = gss_clean[['income', 'sex', 'job_prestige']]
-gss_new['job_prestige_levels'] = pd.cut(gss_new.job_prestige, bins = [14, 25, 36, 47, 58, 69, 80],
-                                        labels = ('15-25', '26-36', '37-47', '48-58', '59-69', '70-80'))
-gss_new = gss_new.dropna()
-gss_new
+my_table3 = gss_clean[['income', 'sex', 'job_prestige']]
+my_table3['job_prestige_levels'] = pd.cut(my_table3.job_prestige, bins = [14, 25, 36, 47, 58, 69, 80],
+                                          labels = ('15-25', '26-36', '37-47', '48-58', '59-69', '70-80'))
+my_table3 = my_table3.dropna()
+my_table3
 
-fig_boxplot_grid = px.box(gss_new, x = 'income', y = 'sex', color = 'sex', color_discrete_map = {'male':'green', 'female':'purple'},
+fig_boxplot_grid = px.box(my_table3, x = 'income', y = 'sex', color = 'sex', color_discrete_map = {'male':'green', 'female':'purple'},
                           facet_col = 'job_prestige_levels', facet_col_wrap = 2,
                           labels = {'income':'Income', 'sex':'Sex'})
 fig_boxplot_grid.show()
 
 x_axis_columns = ['satjob', 'relationship', 'male_breadwinner', 'men_bettersuited', 'child_suffer', 'men_overwork']
 groupby_columns = ['sex', 'region', 'education']
-gss_interactive_barplot = gss_clean[x_axis_columns + groupby_columns].dropna()
-gss_interactive_barplot
+my_table4 = gss_clean[x_axis_columns + groupby_columns].dropna()
+my_table4
 
 app = JupyterDash(__name__, external_stylesheets = external_stylesheets)
 
@@ -134,11 +134,11 @@ app.layout = html.Div(
         
         dcc.Markdown(children = markdown_text),
         
-        html.H2("Table Comparing Variables by Gender"),
+        html.H2("Table Displaying Features by Gender"),
         
         dcc.Graph(figure = table),
         
-        html.H2("Barplot Comparing Views about Male Breadwinners"),
+        html.H2("Barplot Showing Views about Male Breadwinners by Gender"),
         
         dcc.Graph(figure = fig_bar),
         
@@ -152,7 +152,7 @@ app.layout = html.Div(
             
             dcc.Graph(figure = fig_boxplot_income)
         
-        ], style = {'width':'48%', 'float':'left'}),
+        ], style = {"width":"48%", "float":"left"}),
         
         html.Div([
             
@@ -160,13 +160,38 @@ app.layout = html.Div(
             
             dcc.Graph(figure = fig_boxplot_job_prestige)
         
-        ], style = {'width':'48%', 'float':'right'}),
+        ], style = {"width":"48%", "float":"right"}),
         
         html.H2("Boxplot Showing Income & Gender by Level of Job Prestige"),
         
         dcc.Graph(figure = fig_boxplot_grid),
-
+        
+        html.H2("Interactive Barplot"),
+        
+        html.Div([
+            html.H3("x-axis feature"),
+            dcc.Dropdown(id = "x-axis",
+                         options = [{"label":i, "value":i} for i in x_axis_columns],
+                         value = "male_breadwinner"),
+            html.H3("color"),
+            dcc.Dropdown(id = "color",
+                         options = [{"label":i, "value":i} for i in groupby_columns],
+                         value = "sex")], style = {"width":"25%", "float":"left"}),
+        html.Div([dcc.Graph(id = "graph", style = {"width":"70%", "display":"inline-block"})])
     ]
+)
+
+@app.callback(Output(component_id = "graph", component_property = "figure"),
+              [Input(component_id = "x-axis", component_property = "value"),
+               Input(component_id = "color", component_property = "value")])
+
+def make_figure(x, color):
+    return px.bar(
+        my_table4,
+        x = x,
+        color = color,
+        barmode = "group",
+        height = 700
 )
 
 if __name__ == '__main__':
