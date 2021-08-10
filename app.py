@@ -165,34 +165,8 @@ app.layout = html.Div(
         html.H2("Boxplot Showing Income & Gender by Level of Job Prestige"),
         
         dcc.Graph(figure = fig_boxplot_grid),
-        
-        html.H2("Interactive Barplot"),
-        
-        html.Div([
-            html.H3("x-axis feature"),
-            dcc.Dropdown(id = "x-axis",
-                         options = [{"label":i, "value":i} for i in x_axis_columns],
-                         value = "male_breadwinner"),
-            html.H3("color"),
-            dcc.Dropdown(id = "color",
-                        options = [{"label":i, "value":i} for i in groupby_columns],
-                        value = "sex")], style = {"width":"25%", "float":"left"}),
-        html.Div([dcc.Graph(id = "graph", style = {"width":"70%", "display":"inline-block"})])
-        
+
     ]
-)
-
-@app.callback(Output(component_id = "graph", component_property = "figure"),
-              [Input(component_id = "x-axis", component_property = "value"),
-               Input(component_id = "color", component_property = "value")])
-
-def make_figure(x, color):
-    return px.bar(
-        gss_interactive_barplot,
-        x = x,
-        color = color,
-        barmode = "group",
-        height = 700
 )
 
 if __name__ == '__main__':
